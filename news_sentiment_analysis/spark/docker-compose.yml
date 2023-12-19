@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+
+ spark-master:
+  image: bitnami/spark:latest
+  command: bin/spark-class org.apache.spark.deploy.master.Master
+  volumes: [/app/news_collector/data:/app/news_collector/data]
+  ports: ["8080:8080", "7077:7077"]
+  environment:
+   API_TOKEN: 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
+  
+ spark-worker-1:
+  image: bitnami/spark:latest
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+  volumes: [/app/news_collector/data:/app/news_collector/data]
+  depends_on: [spark-master]
+  environment:
+   SPARK_MODE: worker
+   SPARK_WORKER_CORES: 1
+   SPARK_WORKER_MEMORY: 2g
+   SPARK_MASTER_URL: spark://spark-master:7077
+   API_TOKEN: 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
+ 
+ spark-worker-2:
+  image: bitnami/spark:latest
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+  volumes: [/app/news_collector/data:/app/news_collector/data]
+  depends_on: [spark-master]
+  environment:
+   SPARK_MODE: worker
+   SPARK_WORKER_CORES: 1
+   SPARK_WORKER_MEMORY: 2g
+   SPARK_MASTER_URL: spark://spark-master:7077
+   API_TOKEN: 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
